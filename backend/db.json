@@ -9,6 +9,96 @@
       "id": "2",
       "author": "Einstein",
       "quote": "Imagination is more important than knowledge."
+    },
+    {
+      "id": "3",
+      "author": "Marcus Aurelius",
+      "quote": "Fericirea vieții tale depinde de calitatea gândurilor tale."
+    },
+    {
+      "id": "4",
+      "author": "Albert Einstein",
+      "quote": "Imaginația este mai importantă decât cunoașterea. Cunoașterea este limitată, în timp ce imaginația îmbrățișează întregul univers."
+    },
+    {
+      "id": "5",
+      "author": "Constantin Brâncuși",
+      "quote": "Lucrurile nu sunt greu de făcut. Greu este să te pui în starea de a le face."
+    },
+    {
+      "id": "6",
+      "author": "Mahatma Gandhi",
+      "quote": "Fii schimbarea pe care vrei să o vezi în lume."
+    },
+    {
+      "id": "7",
+      "author": "Victor Hugo",
+      "quote": "Nimic nu este mai puternic decât o idee căreia i-a sosit timpul."
+    },
+    {
+      "id": "8",
+      "author": "Lucian Blaga",
+      "quote": "Câteodată, datoria ta față de ceilalți este să fii fericit."
+    },
+    {
+      "id": "9",
+      "author": "Steve Jobs",
+      "quote": "Inovația face diferența dintre un lider și un adept."
+    },
+    {
+      "id": "10",
+      "author": "Seneca",
+      "quote": "Nu pentru școală, ci pentru viață învățăm."
+    },
+    {
+      "id": "11",
+      "author": "Mark Twain",
+      "quote": "Secretul de a merge înainte este pur și simplu să începi."
+    },
+    {
+      "id": "12",
+      "author": "Nelson Mandela",
+      "quote": "Educația este cea mai puternică armă pe care o poți folosi pentru a schimba lumea."
+    },
+    {
+      "id": "13",
+      "author": "Marie Curie",
+      "quote": "Nimic în viață nu trebuie de temut, trebuie doar înțeles. Acum este momentul să înțelegem mai mult, pentru a ne teme mai puțin."
+    },
+    {
+      "id": "14",
+      "author": "Aristotel",
+      "quote": "Cunoașterea de sine este începutul oricărei înțelepciuni."
+    },
+    {
+      "id": "15",
+      "author": "Henry Ford",
+      "quote": "Fie că te gândești că poți, fie că te gândești că nu poți, ai dreptate."
+    },
+    {
+      "id": "16",
+      "author": "Mihai Eminescu",
+      "quote": "Citește! Citind mereu, creierul tău va deveni un laborator de idei și imagini."
+    },
+    {
+      "id": "17",
+      "author": "Helen Keller",
+      "quote": "Singurul lucru mai rău decât a fi orb este să ai vedere, dar să nu ai viziune."
+    },
+    {
+      "id": "18",
+      "author": "Winston Churchill",
+      "quote": "Succesul nu este final, eșecul nu este fatal: curajul de a continua este cel care contează."
+    },
+    {
+      "id": "19",
+      "author": "Mircea Eliade",
+      "quote": "Lumina nu vine din lumină, ci din întuneric."
+    },
+    {
+      "id": "20",
+      "author": "Lao Zi",
+      "quote": "O călătorie de o mie de mile începe cu un singur pas."
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

@@ -1,0 +1,8 @@
+@import "tailwindcss";
+
+@theme {
+  /* Culori mult mai închise pentru un contrast vizibil */
+  --color-brand: #3730a3; /* indigo-800: albastru-indigo foarte închis, excelent pentru titluri */
+  --color-brand-dark: #1e1b4b; /* indigo-950: aproape negru, perfect pentru stările de hover */
+  --color-brand-light: #e0e7ff; /* indigo-100: fundal foarte subtil */
+}
