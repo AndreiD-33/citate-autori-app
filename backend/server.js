@@ -114,19 +114,25 @@ const quoteSchema = Joi.object({
 });
 
 // API route placeholder
-app.get("/", (req, res) => {
-  res.send("Printing Quotes API is running...");
-});
-
-// Extragem citatele
 app.get("/api/quotes", async (req, res) => {
   try {
     const response = await fetch(JSON_SERVER_URL);
     const data = await response.json();
-    res.json(data);
+    const { search } = req.query;
+
+    if (search && search.trim()) {
+      const term = search.trim().toLowerCase();
+      const filtered = data.filter(
+        (q) =>
+          q.author.toLowerCase().includes(term) ||
+          q.quote.toLowerCase().includes(term),
+      );
+      return res.status(200).json(filtered);
+    }
+    res.status(200).json(data);
   } catch (error) {
-    console.error("Eroare la preluarea citatelor:", error);
-    res.status(500).json({ error: "Nu s-au putut prelua citatele" });
+    console.error("Eroare la preluarea citatelor:", error.message);
+    res.status(500).json({ error: "Nu s-au putut prelua citatele." });
   }
 });
 

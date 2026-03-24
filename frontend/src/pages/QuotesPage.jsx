@@ -1,113 +1,125 @@
-// useEffect — execută cod la montarea componentei (echivalent componentDidMount)
-// useState — gestionează starea locală a componentei
 import { useEffect, useState } from "react";
-
-// Link — element de navigare React Router (similar cu <a> fără reload de pagină)
 import { Link } from "react-router-dom";
-
 import QuoteCard from "../components/QuoteCard";
 import { getAllQuotes } from "../api/quotesApi";
 
 export default function QuotesPage() {
-  // `quotes` — lista de citate primită de la backend
-  // `loading` — true cât timp cererea fetch este în desfășurare
-  // `error` — mesajul de eroare dacă fetch eșuează
   const [quotes, setQuotes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [inputValue, setInputValue] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
 
-  // useEffect cu array gol [] = rulează O SINGURĂ DATĂ după primul render
-  // Realizează apeluri API la încărcarea paginii.
   useEffect(() => {
-    getAllQuotes()
-      .then((data) => setQuotes(data))
+    const timer = setTimeout(() => {
+      setSearchTerm(inputValue);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [inputValue]);
+
+  useEffect(() => {
+    setLoading(true);
+    setError(null);
+    getAllQuotes(searchTerm)
+      .then(setQuotes)
       .catch((err) => setError(err.message))
-      .finally(() => setLoading(false)); // se execută indiferent de succes / eroare;
-  }, []); // ← dependențe goale = efectul nu se re-rulează
-
-  // Stări UI intermediare — afișăm feedback vizual
-  if (loading) {
-    return (
-      <div
-        className="min-h-screen flex items-center justify-center bg-
-brand-light"
-      >
-        <p className="text-brand text-lg font-medium animate-pulse">
-          Se încarcă citatele...
-        </p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div
-        className="min-h-screen flex items-center justify-center bg-
-brand-light"
-      >
-        <p className="text-red-500 text-lg font-medium">⚠️ {error}</p>
-      </div>
-    );
-  }
+      .finally(() => setLoading(false));
+  }, [searchTerm]);
 
   return (
-    // min-h-screen = pagina ocupă cel puțin toată înălțimea ecranului
-    // bg-brand-light = fundal ușor colorat din tema custom
-    <div className="min-h-screen bg-brand-light">
-      {/* --- Header --- */}
-      {/* sticky top-0 z-10 = rămâne vizibil la scroll */}
+    <div className="min-h-screen bg-indigo-50">
       <header className="sticky top-0 z-10 bg-white shadow-sm">
-        <div
-          className="max-w-6xl mx-auto px-4 py-4 flex items-center
-justify-between"
-        >
+        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-brand">
-              Citate Autori Celebri
+            <h1 className="text-2xl font-bold text-indigo-600">
+              Printing Quotes
             </h1>
             <p className="text-sm text-gray-500">
-              {quotes.length} {quotes.length === 1 ? "citat" : "citate"}
+              {loading
+                ? "Se caută..."
+                : `${quotes.length} ${quotes.length === 1 ? "citat" : "citate"}`}
             </p>
           </div>
-          {/* Link către ruta /manage — fără reload */}
           <Link
             to="/manage"
-            className="px-4 py-2 bg-brand text-white text-sm font-medium
-                       rounded-lg hover:bg-brand-dark transition-colors
-duration-200"
+            className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors duration-200"
           >
-            ⚙ Administrează
+            Administrează
           </Link>
         </div>
-      </header>
-
-      {/* --- Grid de citate --- */}
-      <main className="max-w-6xl mx-auto px-4 py-8">
-        {quotes.length === 0 ? (
-          <div className="text-center py-20">
-            <p className="text-gray-400 text-xl mb-4">Nu există citate încă.</p>
-            <Link
-              to="/manage"
-              className="text-brand underline hover:text-
-brand-dark"
-            >
-              Adaugă primul citat →
-            </Link>
+        <div className="max-w-6xl mx-auto px-4 pb-4">
+          <div className="relative">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">
+              🔍
+            </span>
+            <input
+              type="text"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              placeholder="Caută după autor sau citat..."
+              className="w-full pl-9 pr-10 py-2.5 border border-gray-200 rounded-xl text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:bg-white transition leading-none"
+            />
+            {inputValue && (
+              <button
+                onClick={() => setInputValue("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-lg"
+              >
+                ✕
+              </button>
+            )}
           </div>
-        ) : (
-          // Grid responsiv:
-          // mobile (implicit): 1 coloană
-          // sm (≥640px):       2 coloane
-          // lg (≥1024px):      3 coloane
-          <div
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3
-gap-6"
-          >
+          {searchTerm && (
+            <p className="text-xs text-indigo-500 mt-1 pl-1">
+              Rezultate pentru: <strong>"{searchTerm}"</strong>
+            </p>
+          )}
+        </div>
+      </header>
+      <main className="max-w-6xl mx-auto px-4 py-8">
+        {error && <p className="text-center text-red-500 py-10">{error}</p>}
+        {!error && !loading && quotes.length === 0 && (
+          <div className="text-center py-20">
+            <p className="text-gray-400 text-xl mb-2">
+              {searchTerm
+                ? `Niciun citat găsit pentru "${searchTerm}".`
+                : "Nu există citate."}
+            </p>
+            {searchTerm ? (
+              <button
+                onClick={() => setInputValue("")}
+                className="text-indigo-500 underline hover:text-indigo-700 text-sm"
+              >
+                Șterge filtrele
+              </button>
+            ) : (
+              <Link
+                to="/manage"
+                className="text-indigo-500 underline hover:text-indigo-700 text-sm"
+              >
+                Adaugă primul citat →
+              </Link>
+            )}
+          </div>
+        )}
+        {loading && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div
+                key={i}
+                className="bg-white rounded-2xl p-6 border border-gray-100 animate-pulse space-y-3"
+              >
+                <div className="h-4 bg-gray-200 rounded w-3/4" />
+                <div className="h-4 bg-gray-200 rounded w-full" />
+                <div className="h-4 bg-gray-200 rounded w-5/6" />
+                <div className="h-3 bg-gray-100 rounded w-1/3 ml-auto mt-4" />
+              </div>
+            ))}
+          </div>
+        )}
+        {!loading && quotes.length > 0 && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {quotes.map((q) => (
-              // key={q.id} este obligatoriu în liste React —
-              // permite React să identifice eficient ce elemente s-au schimbat
               <QuoteCard key={q.id} quote={q} />
-              // fără onEdit/onDelete → butoanele nu apar în QuotesPage
             ))}
           </div>
         )}
