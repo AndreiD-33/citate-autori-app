@@ -6,7 +6,7 @@ import {
   addQuote,
   updateQuote,
   deleteQuote,
-  fetchAuthorImage, // Importul nou
+  fetchAuthorImage,
 } from "../api/quotesApi";
 import { useFormValidation } from "../hooks/useFormValidation";
 

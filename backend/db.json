@@ -4,13 +4,13 @@
       "id": "1",
       "author": "Socrates",
       "quote": "The only true wisdom is in knowing you know nothing.",
-      "imageUrl": " "
+      "imageUrl": "/images/socrate.jpg"
     },
     {
       "id": "2",
       "author": "Einstein",
       "quote": "Imagination is more important than knowledge.",
-      "imageUrl": ""
+      "imageUrl": "/images/einstein.jpg"
     },
     {
       "id": "3",
@@ -28,7 +28,7 @@
       "id": "5",
       "author": "Constantin Brâncuși",
       "quote": "Lucrurile nu sunt greu de făcut. Greu este să te pui în starea de a le face.",
-      "imageUrl": ""
+      "imageUrl": "/images/constantin_brâncuși.jpg"
     },
     {
       "id": "6",
@@ -52,7 +52,7 @@
       "id": "9",
       "author": "Steve Jobs",
       "quote": "Inovația face diferența dintre un lider și un adept.",
-      "imageUrl": ""
+      "imageUrl": "/images/steve_jobs.jpg"
     },
     {
       "id": "10",
@@ -118,7 +118,13 @@
       "id": "20",
       "author": "Lao Zi",
       "quote": "O călătorie de o mie de mile începe cu un singur pas.",
-      "imageUrl": ""
+      "imageUrl": "/images/lao_zi.png"
+    },
+    {
+      "id": "21",
+      "author": "Marcus Aurelius",
+      "quote": "Fericirea vieții tale depinde de calitatea gândurilor talee.",
+      "imageUrl": "/images/marcus_aurelius.jpg"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"
