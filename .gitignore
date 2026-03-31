@@ -17,3 +17,9 @@ build/
 # Fișiere log
 *.log
 npm-debug.log*
+
+# Imaginile descărcate din Wikipedia (generate automat)
+backend/images/*.jpg
+backend/images/*.png
+backend/images/*.jpeg
+backend/images/*.webp
