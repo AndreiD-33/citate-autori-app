@@ -86,3 +86,40 @@ export async function fetchAuthorImage(author) {
 
   return response.json(); // Returnează obiectul cu path-ul static al imaginii
 }
+
+// POST /api/quotes/generate-quote
+export async function generateQuote(author) {
+  const response = await fetch(
+    `${BASE_URL.replace("/quotes", "")}/quotes/generate-quote`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ author }),
+    },
+  );
+
+  if (!response.ok) {
+    const err = await response.json();
+    throw new Error(err.error || "Nu s-a putut genera citatul.");
+  }
+  return response.json();
+}
+
+// POST /api/quotes/author-info
+// Returnează o descriere scurtă despre autor generată de AI.
+// Apelată din QuoteCard la hover pe numele autorului.
+export async function fetchAuthorInfo(author) {
+  const response = await fetch(
+    `${BASE_URL.replace("/quotes", "")}/quotes/author-info`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ author }),
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error("Nu s-au putut prelua informațiile despre autor.");
+  }
+  return response.json(); // returnează obiectul de forma { info: "..." }
+}

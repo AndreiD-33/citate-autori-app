@@ -7,6 +7,7 @@ import {
   updateQuote,
   deleteQuote,
   fetchAuthorImage,
+  generateQuote,
 } from "../api/quotesApi";
 import { useFormValidation } from "../hooks/useFormValidation";
 
@@ -36,12 +37,38 @@ export default function ManagePage() {
   const [feedback, setFeedback] = useState({ message: "", type: "" });
   const [loading, setLoading] = useState(true);
 
-  // Stări noi pentru gestionarea imaginii
+  // Stări noi pentru gestionarea imaginii și AI
   const [imageUrl, setImageUrl] = useState("");
   const [imageLoading, setImageLoading] = useState(false);
   const [imageError, setImageError] = useState("");
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiGenerated, setAiGenerated] = useState(false);
 
   const { errors, validate, clearErrors } = useFormValidation(VALIDATION_RULES);
+
+  useEffect(() => {
+    if (
+      formData.author.trim().length < 3 ||
+      editingQuote ||
+      formData.quote.trim().length > 0
+    )
+      return;
+
+    const timer = setTimeout(async () => {
+      setAiLoading(true);
+      try {
+        const result = await generateQuote(formData.author);
+        setFormData((prev) => ({ ...prev, quote: result.quote }));
+        setAiGenerated(true);
+      } catch (err) {
+        console.warn("Generare AI eșuată:", err.message);
+      } finally {
+        setAiLoading(false);
+      }
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [formData.author, editingQuote]);
 
   useEffect(() => {
     fetchQuotes();
@@ -60,6 +87,9 @@ export default function ManagePage() {
 
   function handleChange(e) {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    if (e.target.name === "quote") {
+      setAiGenerated(false);
+    }
   }
 
   // Funcția nouă pentru preluarea imaginii
@@ -131,6 +161,7 @@ export default function ManagePage() {
     setImageUrl(""); // Resetăm imaginea
     setImageError("");
     clearErrors();
+    setAiGenerated(false);
   }
 
   function showFeedback(message, type) {
@@ -205,7 +236,6 @@ export default function ManagePage() {
                 Imagine autor
               </label>
               <div className="flex gap-2">
-                {/* Butonul caută imaginea pe Wikipedia prin Express */}
                 <button
                   type="button"
                   onClick={handleFetchImage}
@@ -217,7 +247,6 @@ export default function ManagePage() {
                     : "🔍 Caută imagine pe Wikipedia"}
                 </button>
 
-                {/* Dacă există imagine, afişăm buton de ştergere */}
                 {imageUrl && (
                   <button
                     type="button"
@@ -232,19 +261,16 @@ export default function ManagePage() {
                 )}
               </div>
 
-              {/* Mesaj de eroare dacă Wikipedia nu găsește autorul */}
               {imageError && (
                 <p className="mt-1 text-xs text-red-500">{imageError}</p>
               )}
 
-              {/* Previzualizare imagine apare după ce s-a găsit cu succes */}
               {imageUrl && !imageError && (
                 <div className="mt-3 flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-100">
                   <img
                     src={`http://localhost:5000${imageUrl}`}
                     alt={formData.author}
                     className="w-16 h-16 rounded-full object-cover border-2 border-indigo-200"
-                    // Fallback dacă imaginea nu se încarcă
                     onError={(e) => {
                       e.target.style.display = "none";
                     }}
@@ -261,37 +287,65 @@ export default function ManagePage() {
               )}
             </div>
 
+            {/* Secțiunea actualizată pentru textarea (Citat) */}
             <div>
-              <label
-                htmlFor="quote"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Citat
-              </label>
+              <div className="flex items-center justify-between mb-1">
+                <label
+                  htmlFor="quote"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Citat
+                </label>
+
+                {aiLoading && (
+                  <span className="text-xs text-indigo-500 flex items-center gap-1 animate-pulse">
+                    <span>&gt;</span> AI generează citat...
+                  </span>
+                )}
+
+                {aiGenerated && !aiLoading && (
+                  <span className="text-xs bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-full border border-indigo-200">
+                    ✨ Generat de AI
+                  </span>
+                )}
+              </div>
+
               <textarea
                 id="quote"
                 name="quote"
                 value={formData.quote}
                 onChange={handleChange}
-                placeholder="Introduceți citatul..."
+                placeholder={
+                  aiLoading
+                    ? "Se generează citatul..."
+                    : "Introduceți citatul sau așteptați generarea automată..."
+                }
                 rows={4}
-                className={`${inputClass("quote")} resize-none`}
+                className={`${inputClass("quote")} resize-none transition-all ${aiLoading ? "bg-indigo-50 border-indigo-200" : ""}`}
               />
-              <div className="flex justify-between mt-1">
-                {errors.quote ? (
-                  <p className="text-xs text-red-500 flex items-center gap-1">
-                    {errors.quote}
-                  </p>
-                ) : (
-                  <span />
-                )}
+
+              <div className="flex justify-between mt-1 items-start">
+                <div className="flex flex-col gap-1">
+                  {errors.quote && (
+                    <p className="text-xs text-red-500 flex items-center gap-1">
+                      <span>⚠</span> {errors.quote}
+                    </p>
+                  )}
+                  {aiGenerated && !aiLoading && (
+                    <p className="text-xs text-gray-400 italic">
+                      ▲ Citat sugerat de AI – verificați autenticitatea înainte
+                      de salvare.
+                    </p>
+                  )}
+                </div>
                 <span
-                  className={`text-xs ml-auto ${formData.quote.length > 450 ? "text-red-400" : "text-gray-400"}`}
+                  className={`text-xs ml-auto flex-shrink-0 ${formData.quote.length > 450 ? "text-red-400" : "text-gray-400"}`}
                 >
                   {formData.quote.length}/500
                 </span>
               </div>
             </div>
+
             <div className="flex gap-3 pt-2">
               <button
                 type="submit"

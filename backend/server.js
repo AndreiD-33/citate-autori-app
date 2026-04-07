@@ -3,6 +3,8 @@ const cors = require("cors");
 const fs = require("fs");
 const path = require("path");
 const Joi = require("joi");
+require("dotenv").config();
+const OpenAI = require("openai");
 
 const app = express();
 app.use(cors());
@@ -10,6 +12,11 @@ app.use(express.json());
 
 // Directorul unde salvăm imaginile descărcate.
 const IMAGES_DIR = path.join(__dirname, "images");
+
+const openai = new OpenAI({
+  baseURL: "https://models.inference.ai.azure.com",
+  apiKey: process.env.GITHUB_TOKEN,
+});
 
 // Cream directorul /images dacă nu există deja
 if (!fs.existsSync(IMAGES_DIR)) {
@@ -242,4 +249,114 @@ const PORT = process.env.PORT || 5000; // E bine ca PORT să fie mereu cu majusc
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
   console.log(`Serving static images from: ${IMAGES_DIR}`);
+});
+
+// POST /api/quotes/generate-quote
+app.post("/api/quotes/generate-quote", async (req, res) => {
+  const { author } = req.body;
+  if (!author || !author.trim()) {
+    return res
+      .status(400)
+      .json({ error: "Numele autorului este obligatoriu." });
+  }
+
+  try {
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content:
+            "Ești un cunoscator în literatură și filosofie. Generezi citate scurte, inspiraționale și autentice. Răspunzi DOAR cu citatul, fără ghilimele, fără numele autorului, fără explicații suplimentare. Maxim 2 propoziții.",
+        },
+        {
+          role: "user",
+          content: `Scrie un citat autentic specific lui ${author.trim()}. Dacă autorul are citate celebre cunoscute, folosește unul dintre ele. Dacă nu, generează unul în stilul și filosofia sa.`,
+        },
+      ],
+      max_tokens: 150,
+      temperature: 0.7,
+    });
+
+    const generatedQuote = completion.choices[0].message.content.trim();
+    res.status(200).json({ quote: generatedQuote });
+  } catch (error) {
+    console.error("Eroare OpenAI:", error.message);
+    if (error.status === 401) {
+      return res.status(500).json({ error: "Cheie API OpenAI invalidă." });
+    }
+    res.status(500).json({ error: "Nu s-a putut genera citatul." });
+  }
+});
+
+// POST /api/quotes/author-info
+// Primește { author } și returnează o descriere scurtă despre autor, generată de AI.
+app.post("/api/quotes/author-info", async (req, res) => {
+  const { author } = req.body;
+
+  if (!author || !author.trim()) {
+    return res
+      .status(400)
+      .json({ error: "Numele autorului este obligatoriu." });
+  }
+
+  try {
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content:
+            'Ești un asistent concis care descrie personalități istorice. Răspunzi doar în limba română. Răspunsul conține EXACT doua propoziții scurte. Menționezi: domeniul, perioada și contribuția principală. Fără introduceri, fără "Sigur!", fără explicații extra.',
+        },
+        {
+          role: "user",
+          content: `Descrie pe ${author.trim()} în exact 2 propoziții.`,
+        },
+      ],
+      max_tokens: 120,
+      temperature: 0.5,
+    });
+
+    const info = completion.choices[0].message.content.trim();
+    res.status(200).json({ info });
+  } catch (error) {
+    console.error("Eroare author-info:", error.message);
+    res.status(500).json({ error: "Nu s-au putut prelua informațiile." });
+  }
+});
+
+// POST /api/quotes/author-info
+app.post("/api/quotes/author-info", async (req, res) => {
+  const { author } = req.body;
+  if (!author || !author.trim()) {
+    return res
+      .status(400)
+      .json({ error: "Numele autorului este obligatoriu." });
+  }
+
+  try {
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content:
+            'Ești un asistent concis care descrie personalități istorice. Răspunzi doar în limba română. Răspunsul conține EXACT doua propoziții scurte. Menționezi: domeniul, perioada și contribuția principală. Fără introduceri, fără "Sigur!", fără explicații extra.',
+        },
+        {
+          role: "user",
+          content: `Descrie pe ${author.trim()} în exact 2 propoziții.`,
+        },
+      ],
+      max_tokens: 120,
+      temperature: 0.5,
+    });
+
+    const info = completion.choices[0].message.content.trim();
+    res.status(200).json({ info });
+  } catch (error) {
+    console.error("Eroare author-info:", error.message);
+    res.status(500).json({ error: "Nu s-au putut prelua informațiile." });
+  }
 });
